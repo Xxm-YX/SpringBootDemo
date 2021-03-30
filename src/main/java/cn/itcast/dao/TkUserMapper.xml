@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.itcast.dao.TkUserMapper">
+
+    <resultMap id="BaseResultMap" type="cn.itcast.pojo.TkUserPojo">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="age" jdbcType="TINYINT" property="age"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="deleted" jdbcType="BIT" property="deleted"/>
+    </resultMap>
+
+ <!--批量插入-->
+    <insert id="insertBatch">
+        INSERT INTO tk_user (`name`, age)
+        VALUES
+        <foreach collection="list" item="user" separator=",">
+            (#{user.name}, #{user.age})
+        </foreach>
+    </insert>
+
+    <!--批量更新，因为是id查询且没有test判断，要求必须有id，否则报错，所以不担心修改全表的问题-->
+    <update id="updateBatch">
+        <foreach collection="list" item="user" separator=";">
+            UPDATE tk_user
+            <set>
+                <if test="user.name != null and user.name.trim() != ''">
+                    `name` = #{user.name},
+                </if>
+                <if test="user.age != null">
+                    age = #{user.age},
+                </if>
+            </set>
+            WHERE id = #{user.id} and deleted = 0
+        </foreach>
+    </update>
+
+    <!--批量删除（逻辑删除），防止条件为空时删除全表-->
+    <update id="deleteBatch">
+        <foreach collection="list" item="user" separator=";">
+            UPDATE tk_user set deleted = 1
+            <where>
+                <choose>
+                    <when test="user.name != null and user.name.trim() != ''">
+                        and `name` = #{user.name}
+                    </when>
+                    <otherwise>
+                        and 1=0
+                    </otherwise>
+                </choose>
+                and deleted = 0
+            </where>
+        </foreach>
+    </update>
+
+    <!--批量查询 避免ids.size()==0时查出全表数据，负担太大了，可能会爆-->
+    <select id="selectBatch" resultType="cn.itcast.pojo.TkUserPojo">
+        SELECT
+        `name`,
+        age
+        FROM tk_user
+        <where>
+            <choose>
+                <when test="ids!=null and ids.size()>0">
+                    <foreach collection="ids" item="id" open=" and id in (" close=")" separator=",">
+                        #{id}
+                    </foreach>
+                </when>
+                <otherwise>
+                    and 1=0
+                </otherwise>
+            </choose>
+            and deleted = 0
+        </where>
+    </select>
+</mapper>
