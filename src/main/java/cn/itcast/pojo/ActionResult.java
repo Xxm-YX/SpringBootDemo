@@ -34,7 +34,7 @@ public class ActionResult extends BaseModel{
     @JsonIgnore
     private String logDescribe;
 
-    public List<Object> getList(){
-        return (List<Object>) this.getData();
-    }
+//    public List<Object> getList(){
+//        return (List<Object>) this.getData();
+//    }
 }
