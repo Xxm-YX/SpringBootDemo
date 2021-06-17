@@ -1,4 +1,4 @@
-package cn.itcast.web;
+package cn.itcast.web.controller;
 
 //import cn.itcast.pojo.TkUserPojo;
 import cn.itcast.pojo.ActionResult;

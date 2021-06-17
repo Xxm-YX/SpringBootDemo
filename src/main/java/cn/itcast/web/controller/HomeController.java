@@ -1,4 +1,4 @@
-package cn.itcast.web;
+package cn.itcast.web.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
